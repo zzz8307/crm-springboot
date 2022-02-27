@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rc.crm.workbench.dao.ActivityMapper">
+    <resultMap id="BaseResultMap" type="com.rc.crm.workbench.domain.Activity">
+        <id column="id" jdbcType="CHAR" property="id"/>
+        <result column="owner" jdbcType="CHAR" property="owner"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="start_date" jdbcType="DATE" property="startDate"/>
+        <result column="end_date" jdbcType="DATE" property="endDate"/>
+        <result column="cost" jdbcType="INTEGER" property="cost"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="edit_time" jdbcType="TIMESTAMP" property="editTime"/>
+        <result column="edit_by" jdbcType="VARCHAR" property="editBy"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, owner, name, start_date, end_date, cost, description, create_time, create_by,
+    edit_time, edit_by
+    </sql>
+    <select id="selectByExample" parameterType="com.rc.crm.workbench.domain.ActivityExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from tbl_activity
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tbl_activity
+        where id = #{id,jdbcType=CHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from tbl_activity
+        where id = #{id,jdbcType=CHAR}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.rc.crm.workbench.domain.ActivityExample">
+        delete from tbl_activity
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.rc.crm.workbench.domain.Activity">
+        insert into tbl_activity (id, owner, name, start_date,
+                                  end_date, cost, description,
+                                  create_time, create_by, edit_time,
+                                  edit_by)
+        values (#{id,jdbcType=CHAR}, #{owner,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{startDate,jdbcType=DATE},
+                #{endDate,jdbcType=DATE}, #{cost,jdbcType=INTEGER}, #{description,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{editTime,jdbcType=TIMESTAMP},
+                #{editBy,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.rc.crm.workbench.domain.Activity">
+        insert into tbl_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="owner != null">
+                owner,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="cost != null">
+                cost,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="editTime != null">
+                edit_time,
+            </if>
+            <if test="editBy != null">
+                edit_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=CHAR},
+            </if>
+            <if test="owner != null">
+                #{owner,jdbcType=CHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=DATE},
+            </if>
+            <if test="cost != null">
+                #{cost,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="editTime != null">
+                #{editTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="editBy != null">
+                #{editBy,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.rc.crm.workbench.domain.ActivityExample" resultType="java.lang.Long">
+        select count(*) from tbl_activity
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update tbl_activity
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=CHAR},
+            </if>
+            <if test="record.owner != null">
+                owner = #{record.owner,jdbcType=CHAR},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.startDate != null">
+                start_date = #{record.startDate,jdbcType=DATE},
+            </if>
+            <if test="record.endDate != null">
+                end_date = #{record.endDate,jdbcType=DATE},
+            </if>
+            <if test="record.cost != null">
+                cost = #{record.cost,jdbcType=INTEGER},
+            </if>
+            <if test="record.description != null">
+                description = #{record.description,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.createBy != null">
+                create_by = #{record.createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="record.editTime != null">
+                edit_time = #{record.editTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.editBy != null">
+                edit_by = #{record.editBy,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update tbl_activity
+        set id = #{record.id,jdbcType=CHAR},
+        owner = #{record.owner,jdbcType=CHAR},
+        name = #{record.name,jdbcType=VARCHAR},
+        start_date = #{record.startDate,jdbcType=DATE},
+        end_date = #{record.endDate,jdbcType=DATE},
+        cost = #{record.cost,jdbcType=INTEGER},
+        description = #{record.description,jdbcType=VARCHAR},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        create_by = #{record.createBy,jdbcType=VARCHAR},
+        edit_time = #{record.editTime,jdbcType=TIMESTAMP},
+        edit_by = #{record.editBy,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rc.crm.workbench.domain.Activity">
+        update tbl_activity
+        <set>
+            <if test="owner != null">
+                owner = #{owner,jdbcType=CHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+            <if test="cost != null">
+                cost = #{cost,jdbcType=INTEGER},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="editTime != null">
+                edit_time = #{editTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="editBy != null">
+                edit_by = #{editBy,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=CHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rc.crm.workbench.domain.Activity">
+        update tbl_activity
+        set owner       = #{owner,jdbcType=CHAR},
+            name        = #{name,jdbcType=VARCHAR},
+            start_date  = #{startDate,jdbcType=DATE},
+            end_date    = #{endDate,jdbcType=DATE},
+            cost        = #{cost,jdbcType=INTEGER},
+            description = #{description,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            create_by   = #{createBy,jdbcType=VARCHAR},
+            edit_time   = #{editTime,jdbcType=TIMESTAMP},
+            edit_by     = #{editBy,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=CHAR}
+    </update>
+
+    <select id="selectByConditionsJoinUser" resultMap="BaseResultMap">
+        SELECT a.id, a.name, u.name AS owner, start_date, end_date
+        FROM tbl_activity a
+        JOIN tbl_user u
+        ON a.owner = u.id
+        <where>
+            <if test="name != null and name != ''">
+                AND a.name LIKE '%' #{name} '%'
+            </if>
+            <if test="owner != null and owner != ''">
+                AND u.name LIKE '%' #{owner} '%'
+            </if>
+            <if test="startDate != null">
+                AND start_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND end_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.start_date DESC
+    </select>
+</mapper>

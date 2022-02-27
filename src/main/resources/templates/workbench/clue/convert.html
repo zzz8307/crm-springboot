@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <link href="../../../static/jquery/bootstrap_3.3.0/css/bootstrap.min.css"
+          th:href="@{/static/jquery/bootstrap_3.3.0/css/bootstrap.min.css}" type="text/css" rel="stylesheet"/>
+    <script type="text/javascript" src="../../../static/jquery/jquery-1.11.1-min.js"
+            th:src="@{/static/jquery/jquery-1.11.1-min.js}"></script>
+    <script type="text/javascript" src="../../../static/jquery/bootstrap_3.3.0/js/bootstrap.min.js"
+            th:src="@{/static/jquery/bootstrap_3.3.0/js/bootstrap.min.js}"></script>
+
+
+    <link href="../../../static/jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css"
+          th:href="@{/static/jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css}"
+          type="text/css" rel="stylesheet"/>
+    <script type="text/javascript"
+            src="../../../static/jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"
+            th:src="@{/static/jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js}"></script>
+    <script type="text/javascript"
+            src="../../../static/jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"
+            th:src="@{/static/jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        $(function () {
+            $(".time").datetimepicker({
+                minView: "month",
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayBtn: true,
+                pickerPosition: "top-left"
+            });
+
+            $("#isCreateTransaction").click(function () {
+                if (this.checked) {
+                    $("#create-transaction2").show(200);
+                } else {
+                    $("#create-transaction2").hide(200);
+                }
+            });
+
+            $("#activity-search").keypress(function (event) {
+                if (event.keyCode === 13) return false;
+                let fun = debounce(search, 250);
+                fun();
+            })
+
+            $("#activity-search").keyup(function (event) {
+                if (event.keyCode === 8) $("#activity-search").keypress();
+            })
+
+            $("#convert-button").click(function () {
+                let id = /*[[${id}]]*/ id;
+                if ($("#isCreateTransaction").is(":checked")) {
+                    $.ajax({
+                        url: "converter",
+                        data: {
+                            "clueId": id,
+                            "isCreateTransaction": true,
+                            "money": $.trim($("#money").val()),
+                            "name": $.trim($("#name").val()),
+                            "expectedDate": $("#expectedDate").val(),
+                            "stage": $("#stage").val(),
+                            "activityId": $("#activityId").val()
+                        },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.success) {
+                                alert("线索转换成功");
+                                window.location.href = "index";
+                            } else {
+                                alert("线索转换失败");
+                            }
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        url: "converter",
+                        data: {
+                            "clueId": id,
+                            "isCreateTransaction": false
+                        },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.success) {
+                                alert("线索转换成功");
+                                window.location.href = "index";
+                            } else {
+                                alert("线索转换失败");
+                            }
+                        }
+                    })
+                }
+            })
+        });
+    </script>
+    <script type="text/javascript">
+        var timer = null;
+
+        function debounce(method, delay) {
+            return function () {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    method.apply(this, arguments);
+                }, delay);
+            }
+        }
+
+        function search() {
+            let params = {
+                "query": $.trim($("#activity-search").val())
+            }
+            $("#activity-table-div").load("convertActivityList?" + $.param(params))
+        }
+    </script>
+</head>
+<body>
+
+<!-- 搜索市场活动的模态窗口 -->
+<div class="modal fade" id="searchActivityModal" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">搜索市场活动</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
+                    <form class="form-inline" role="form">
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control" style="width: 300px;" id="activity-search"
+                                   placeholder="请输入市场活动名称，支持模糊查询">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </form>
+                </div>
+                <div id="activity-table-div" th:fragment="activity-table-div">
+                    <script type="text/javascript">
+                        function setActivityFields (id) {
+                            $("#activityId").val(id);
+                            $("#activity").val($("#activity-name-" + id).text());
+                            $("#searchActivityModal").modal("hide");
+                        }
+                    </script>
+                    <table id="activityTable" class="table table-hover"
+                           style="width: 900px; position: relative;top: 10px;">
+                        <thead>
+                        <tr style="color: #B3B3B3;">
+                            <td></td>
+                            <td>名称</td>
+                            <td>开始日期</td>
+                            <td>结束日期</td>
+                            <td>所有者</td>
+                            <td></td>
+                        </tr>
+                        </thead>
+                        <tbody th:if="${!#lists.isEmpty(activityList)}">
+                        <tr th:each="activity:${activityList}" th:object="${activity}">
+                            <td><input type="radio" th:value="*{id}" name="activity" th:onclick="setActivityFields([[*{id}]])"/></td>
+                            <td th:text="*{name}" th:id="activity-name-+*{id}">发传单</td>
+                            <td th:text="*{#dates.format(startDate, 'yyyy-MM-dd')}">2020-10-10</td>
+                            <td th:text="*{#dates.format(endDate, 'yyyy-MM-dd')}">2020-10-20</td>
+                            <td th:text="*{owner}">zhangsan</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="title" class="page-header" style="position: relative; left: 20px;">
+    <h4>转换线索 <small><span th:text="${fullname}">李四</span><span th:text="${appellation}">先生</span>-<span
+            th:text="${company}">动力节点</span></small></h4>
+</div>
+<div id="create-customer" style="position: relative; left: 40px; height: 35px;">
+    新建客户：<span th:text="${company}">动力节点</span>
+</div>
+<div id="create-contact" style="position: relative; left: 40px; height: 35px;">
+    新建联系人：<span th:text="${fullname}">李四</span><span th:text="${appellation}">先生</span>
+</div>
+<div id="create-transaction1" style="position: relative; left: 40px; height: 35px; top: 25px;">
+    <input type="checkbox" id="isCreateTransaction"/>
+    为客户创建交易
+</div>
+<div id="create-transaction2"
+     style="position: relative; left: 40px; top: 20px; width: 80%; background-color: #F7F7F7; display: none;">
+
+    <form>
+        <div class="form-group" style="width: 400px; position: relative; left: 20px;">
+            <label for="money">金额</label>
+            <input type="text" class="form-control" id="money">
+        </div>
+        <div class="form-group" style="width: 400px;position: relative; left: 20px;">
+            <label for="name">交易名称</label>
+            <input type="text" class="form-control" id="name" value="动力节点-">
+        </div>
+        <div class="form-group" style="width: 400px;position: relative; left: 20px;">
+            <label for="expectedDate">预计成交日期</label>
+            <input type="text" class="form-control time" readonly="readonly" id="expectedDate">
+        </div>
+        <div class="form-group" style="width: 400px;position: relative; left: 20px;">
+            <label for="stage">阶段</label>
+            <select id="stage" class="form-control">
+                <option th:each="stage:${application.stageList}"
+                        th:value="${stage.value}" th:text="${stage.text}">先生
+                </option>
+            </select>
+        </div>
+        <div class="form-group" style="width: 400px;position: relative; left: 20px;">
+            <input type="hidden" id="activityId">
+            <label for="activity">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" data-toggle="modal"
+                                                      data-target="#searchActivityModal" style="text-decoration: none;"><span
+                    class="glyphicon glyphicon-search"></span></a></label>
+            <input type="text" class="form-control" id="activity" placeholder="点击上面搜索" readonly="readonly">
+        </div>
+    </form>
+
+</div>
+
+<div id="owner" style="position: relative; left: 40px; height: 35px; top: 50px;">
+    记录的所有者：<br>
+    <b><span th:text="${owner}">zhangsan</span></b>
+</div>
+<div id="operation" style="position: relative; left: 40px; height: 35px; top: 100px;">
+    <input class="btn btn-primary" type="button" id="convert-button" value="转换">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="javascript:void(0);" onclick="window.history.back();"><input class="btn btn-default" type="button"
+                                                                          value="取消"></a>
+</div>
+</body>
+</html>
